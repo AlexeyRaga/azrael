@@ -1,0 +1,7 @@
+dist/
+dist-newstyle/
+.ghc-env*
+.cabal.project.local
+*.hp
+*.svg
+*.perf

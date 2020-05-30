@@ -1,0 +1,50 @@
+cabal-version:       2.4
+name:                azrail
+version:             0.1.0.0
+-- synopsis:
+-- description:
+-- bug-reports:
+-- license:
+license-file:        LICENSE
+-- author:
+-- maintainer:
+-- copyright:
+-- category:
+build-type:          Simple
+extra-source-files:  CHANGELOG.md
+
+common common
+  default-language:     Haskell2010
+  build-depends:        base >=4.12 && <4.13
+                      , base64-bytestring
+                      , bytestring
+                      , http-client
+                      , lens
+                      , network-uri
+                      , text
+                      , wreq
+
+
+library
+  import:               common
+  hs-source-dirs:       lib
+  exposed-modules:      Azure.Storage.Blob
+  -- other-modules:
+  -- other-extensions:
+
+executable azrail
+  import:               common
+  hs-source-dirs:       app
+  main-is:              Main.hs
+  other-modules:        Options
+  build-depends:        azrail
+                      , optparse-applicative
+
+  -- other-extensions:
+
+test-suite azrail-test
+  import:               common
+  hs-source-dirs:       test
+  type:                 exitcode-stdio-1.0
+  main-is:              MyLibTest.hs
+  build-depends:        azrail
