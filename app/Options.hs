@@ -1,3 +1,4 @@
+{-# LANGUAGE DuplicateRecordFields #-}
 module Options
 where
 
@@ -12,11 +13,17 @@ data Options = Options
 data Command
   = Put CopyFile
   | Get CopyFile
+  | Delete DeleteFile
 
 data CopyFile = CopyFile
   { container :: ContainerName
-  , azureBlob :: BlobName
+  , blobName  :: BlobName
   , localFile :: FilePath
+  }
+
+data DeleteFile = DeleteFile
+  { container :: ContainerName
+  , blobName  :: BlobName
   }
 
 options :: ParserInfo Options
@@ -34,12 +41,13 @@ optionsParser = Options
 commandParser :: Parser Command
 commandParser =
   subparser
-    (  command "get" (info (Get <$> copyOptionsParser) (progDesc "Get file from Azure Storage"))
-    <> command "put" (info (Put <$> copyOptionsParser) (progDesc "Put file to Azure Storage"))
+    (  command "get" (info (Get <$> copyParser) (progDesc "Get file from Azure Storage"))
+    <> command "put" (info (Put <$> copyParser) (progDesc "Put file to Azure Storage"))
+    <> command "delete" (info (Delete <$> deleteParser) (progDesc "Delete file from Azure Storage"))
     )
 
-copyOptionsParser :: Parser CopyFile
-copyOptionsParser = CopyFile
+copyParser :: Parser CopyFile
+copyParser = CopyFile
   <$> strOption
         (  long "container-name"
         <> metavar "NAME"
@@ -56,6 +64,18 @@ copyOptionsParser = CopyFile
         <> help "Local file path"
         )
 
+deleteParser :: Parser DeleteFile
+deleteParser = DeleteFile
+  <$> strOption
+        (  long "container-name"
+        <> metavar "NAME"
+        <> help "Azure Storage container name"
+        )
+  <*> strOption
+        (  long "blob-name"
+        <> metavar "PATH"
+        <> help "Azure Storage blob name"
+        )
 
 accountParser :: Parser Account
 accountParser = Account
