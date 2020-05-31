@@ -14,7 +14,7 @@ main = do
   let acc = account opts
   case (cmd opts) of
     Put params    -> putFile acc params
-    Get params    -> getFile acc params
+    Get params    -> getStream acc params
     Delete params -> deleteFile acc params
 
 
@@ -37,3 +37,10 @@ deleteFile :: Account
   -> IO ()
 deleteFile account (DeleteFile container blob) =
   void $ deleteBlob account container blob
+
+getStream :: Account
+  -> CopyFile
+  -> IO ()
+getStream account (CopyFile container blob path) = do
+  lbs <- getBlobStream account container blob
+  maybe (error "Blob not found") (LBS.writeFile path) lbs

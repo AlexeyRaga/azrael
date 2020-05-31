@@ -11,6 +11,7 @@ module Azure.Storage.Blob
 , putBlobBS
 , putBlobStream
 , getBlobBS
+, getBlobStream
 , deleteBlob
 )
 where
@@ -18,6 +19,7 @@ where
 import           Control.Exception       (throwIO, try)
 import           Control.Lens
 import           Control.Monad           (mapM, void)
+import           Control.Monad.Lazy      (interleaveUnfoldrIO)
 import qualified Data.ByteString         as BS
 import qualified Data.ByteString.Base64  as B64
 import qualified Data.ByteString.Builder as BSBuilder
@@ -97,6 +99,29 @@ putBlobStream account container blob payload = do
         , foldMap (\p -> "<Latest>" <> BSBuilder.string8 p <> "</Latest>") parts
         , "</BlockList>"
         ]
+
+getBlobStream :: Account -> ContainerName -> BlobName -> IO (Maybe LBS.ByteString)
+getBlobStream account container blob = do
+  let blobUrl = authorisedBlobUrl account container blob
+  res <- interleaveUnfoldrIO (\start -> getChunk start streamBlockSize blobUrl) 0
+  case res of
+    [] -> pure Nothing
+    chunks ->
+      let builder = mconcat (BSBuilder.lazyByteString <$> chunks)
+      in pure $ Just (BSBuilder.toLazyByteString builder)
+  where
+    getChunk start size blobUrl = do
+      let end = start + size
+      let range = "bytes=" <> show start <> "-" <> show end
+      let options = azureOptions & Wreq.checkResponse ?~ suppressStatusCodes [404, 416]
+                                 & Wreq.header "x-ms-range" .~ [C8.pack range]
+      resp <- Wreq.getWith options blobUrl
+
+      case resp ^. Wreq.responseStatus . Wreq.statusCode of
+        404 -> pure Nothing
+        416 -> pure Nothing
+        _   -> pure (Just (resp ^. Wreq.responseBody, end + 1))
+
 
 getBlobBS :: Account -> ContainerName -> BlobName -> IO (Maybe LBS.ByteString)
 getBlobBS account container blob = do

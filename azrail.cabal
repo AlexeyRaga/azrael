@@ -29,7 +29,7 @@ library
   import:               common
   hs-source-dirs:       lib
   exposed-modules:      Azure.Storage.Blob
-  -- other-modules:
+  other-modules:        Control.Monad.Lazy
   -- other-extensions:
 
 executable azrail
