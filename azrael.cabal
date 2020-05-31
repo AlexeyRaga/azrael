@@ -1,5 +1,5 @@
 cabal-version:       2.4
-name:                azrail
+name:                azrael
 version:             0.1.0.0
 -- synopsis:
 -- description:
@@ -32,19 +32,19 @@ library
   other-modules:        Control.Monad.Lazy
   -- other-extensions:
 
-executable azrail
+executable azrael
   import:               common
   hs-source-dirs:       app
   main-is:              Main.hs
   other-modules:        Options
-  build-depends:        azrail
+  build-depends:        azrael
                       , optparse-applicative
 
   -- other-extensions:
 
-test-suite azrail-test
+test-suite azrael-test
   import:               common
   hs-source-dirs:       test
   type:                 exitcode-stdio-1.0
   main-is:              MyLibTest.hs
-  build-depends:        azrail
+  build-depends:        azrael
