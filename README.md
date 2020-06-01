@@ -1,3 +1,4 @@
 # Azrael
 
-An (experimental, WIP) library that provides Haskell bindings to MS Azure services.
+`Azrael` == **Az**ure **R**EST **A**PI **E**ssentials **L**ibrary.
+
